@@ -7,12 +7,6 @@ use Illuminate\Http\UploadedFile;
 
 class MediaUploader
 {
-    /** @var string */
-    const VISIBILITY_PUBLIC = 'public';
-
-    /** @var string  */
-    const VISIBILITY_PRIVATE = 'private';
-
     /** @var UploadedFile */
     protected $file;
 
@@ -22,16 +16,22 @@ class MediaUploader
     /** @var string */
     protected $fileName;
 
-    /** @var string */
-    protected $visibility = self::VISIBILITY_PUBLIC;
-
     /** @var array */
     protected $attributes = [];
 
+    /** @var string */
+    protected $visibility = self::VISIBILITY_PUBLIC;
+
+    /** @var string */
+    const VISIBILITY_PUBLIC = 'public';
+
+    /** @var string  */
+    const VISIBILITY_PRIVATE = 'private';
+
     /**
-     * Create a new MediaUploader instance.
+     * Create a new uploader instance.
      *
-     * @param  UploadedFile  $file
+     * @param UploadedFile $file
      * @return void
      */
     public function __construct(UploadedFile $file)
@@ -40,8 +40,8 @@ class MediaUploader
     }
 
     /**
-     * @param  UploadedFile  $file
-     * @return MediaUploader
+     * @param UploadedFile $file
+     * @return self
      */
     public static function fromFile(UploadedFile $file)
     {
@@ -49,10 +49,10 @@ class MediaUploader
     }
 
     /**
-     * Set the file to be uploaded.
+     * Set the source file.
      *
-     * @param  UploadedFile  $file
-     * @return MediaUploader
+     * @param UploadedFile $file
+     * @return self
      */
     public function setFile(UploadedFile $file)
     {
@@ -70,8 +70,8 @@ class MediaUploader
     /**
      * Set the name of the media item.
      *
-     * @param  string  $name
-     * @return MediaUploader
+     * @param string $name
+     * @return self
      */
     public function setName(string $name)
     {
@@ -81,8 +81,8 @@ class MediaUploader
     }
 
     /**
-     * @param  string  $name
-     * @return MediaUploader
+     * @param string $name
+     * @return self
      */
     public function useName(string $name)
     {
@@ -92,8 +92,8 @@ class MediaUploader
     /**
      * Set the name of the file.
      *
-     * @param  string  $fileName
-     * @return MediaUploader
+     * @param string $fileName
+     * @return self
      */
     public function setFileName(string $fileName)
     {
@@ -103,8 +103,8 @@ class MediaUploader
     }
 
     /**
-     * @param  string  $fileName
-     * @return MediaUploader
+     * @param string $fileName
+     * @return self
      */
     public function useFileName(string $fileName)
     {
@@ -112,10 +112,10 @@ class MediaUploader
     }
 
     /**
-     * Sanitise the file name.
+     * Sanitise the given file name.
      *
      * @param  string  $fileName
-     * @return string
+     * @return self
      */
     protected function sanitiseFileName(string $fileName)
     {
@@ -123,10 +123,32 @@ class MediaUploader
     }
 
     /**
+     * Set any additional attributes to be saved on the media item.
+     *
+     * @param array $attributes
+     * @return self
+     */
+    public function withAttributes(array $attributes)
+    {
+        $this->attributes = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * @param array $properties
+     * @return self
+     */
+    public function withProperties(array $properties)
+    {
+        return $this->withAttributes($properties);
+    }
+
+    /**
      * Set the file visibility.
      *
      * @param string $visibility
-     * @return $this
+     * @return self
      */
     public function setVisibility(string $visibility)
     {
@@ -145,29 +167,7 @@ class MediaUploader
     }
 
     /**
-     * Set any custom attributes to be saved to the media item.
-     *
-     * @param  array  $attributes
-     * @return MediaUploader
-     */
-    public function withAttributes(array $attributes)
-    {
-        $this->attributes = $attributes;
-
-        return $this;
-    }
-
-    /**
-     * @param  array  $properties
-     * @return MediaUploader
-     */
-    public function withProperties(array $properties)
-    {
-        return $this->withAttributes($properties);
-    }
-
-    /**
-     * Upload the file to the specified disk.
+     * Upload the file and create a media item.
      *
      * @return mixed
      */
