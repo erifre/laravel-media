@@ -2,28 +2,30 @@
 
 namespace Optix\Media;
 
+use InvalidArgumentException;
 use Illuminate\Http\UploadedFile;
 
 class MediaUploader
 {
-    /**
-     * @var UploadedFile
-     */
+    /** @var string */
+    const VISIBILITY_PUBLIC = 'public';
+
+    /** @var string  */
+    const VISIBILITY_PRIVATE = 'private';
+
+    /** @var UploadedFile */
     protected $file;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $name;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $fileName;
 
-    /**
-     * @var array
-     */
+    /** @var string */
+    protected $visibility = self::VISIBILITY_PUBLIC;
+
+    /** @var array */
     protected $attributes = [];
 
     /**
@@ -121,6 +123,28 @@ class MediaUploader
     }
 
     /**
+     * Set the file visibility.
+     *
+     * @param string $visibility
+     * @return $this
+     */
+    public function setVisibility(string $visibility)
+    {
+        if (! in_array($visibility, [
+            $public = self::VISIBILITY_PUBLIC,
+            $private = self::VISIBILITY_PRIVATE,
+        ])) {
+            throw new InvalidArgumentException(
+                "The given visibility must be either `{$public}` or `{$private}`."
+            );
+        }
+
+        $this->visibility = $visibility;
+
+        return $this;
+    }
+
+    /**
      * Set any custom attributes to be saved to the media item.
      *
      * @param  array  $attributes
@@ -166,9 +190,10 @@ class MediaUploader
         $media->filesystem()->putFileAs(
             $media->getDirectory(),
             $this->file,
-            $this->fileName
+            $this->fileName,
+            $this->visibility
         );
 
-        return $media->fresh();
+        return $media;
     }
 }
