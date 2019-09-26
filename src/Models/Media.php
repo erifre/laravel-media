@@ -50,6 +50,17 @@ class Media extends Model
     }
 
     /**
+     * Check if media has a specific conversion.
+     *
+     * @param  string  $conversion
+     * @return bool
+     */
+    public function hasConversion(string $conversion)
+    {
+        return $this->filesystem()->exists($this->getPath($conversion));
+    }
+
+    /**
      * Get the url to the file.
      *
      * @param  string  $conversion
