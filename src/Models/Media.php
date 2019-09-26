@@ -2,6 +2,7 @@
 
 namespace Optix\Media\Models;
 
+use Optix\Media\Jobs\PerformConversions;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -58,6 +59,19 @@ class Media extends Model
     public function hasConversion(string $conversion)
     {
         return $this->filesystem()->exists($this->getPath($conversion));
+    }
+
+    /**
+     * Queue conversions for media.
+     *
+     * @param  string  ...$conversions
+     * @return void
+     */
+    public function performConversions(...$conversions)
+    {
+        PerformConversions::dispatch(
+            $this, $conversions
+        );
     }
 
     /**
