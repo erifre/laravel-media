@@ -46,7 +46,20 @@ class ImageManipulator
         }
 
         foreach ($conversions as $conversion) {
-            $path = $media->getPath($conversion);
+
+            // Handle params
+            if (is_array($conversion)) {
+              $conversionPath = $conversion[1];
+              $args = array_slice($conversion, 2);
+              $conversion = $conversion[0];
+              $onlyIfMissing = false;
+            }
+            else {
+              $args = [];
+              $conversionPath = $conversion;
+            }
+
+            $path = $media->getPath($conversionPath);
 
             if ($onlyIfMissing && $media->filesystem()->exists($path)) {
                 continue;
@@ -54,9 +67,9 @@ class ImageManipulator
 
             $converter = $this->conversionRegistry->get($conversion);
 
-            $image = $converter(
-                $this->imageManager->make($media->getFullPath())
-            );
+            array_unshift($args, $this->imageManager->make($media->getFullPath()));
+
+            $image = call_user_func_array($converter, $args);
 
             $media->filesystem()->put($path, $image->stream());
         }
