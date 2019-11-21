@@ -5,6 +5,8 @@ namespace Optix\Media;
 use Optix\Media\Models\Media;
 use Intervention\Image\ImageManager;
 
+use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
+
 class ImageManipulator
 {
     /**
@@ -72,6 +74,10 @@ class ImageManipulator
             $image = call_user_func_array($converter, $args);
 
             $media->filesystem()->put($path, $image->stream());
+
+            if (class_exists('ImageOptimizer')) {
+              ImageOptimizer::optimize($media->getFullPath($conversionPath));
+            }
         }
     }
 }
